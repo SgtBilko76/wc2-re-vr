@@ -923,6 +923,14 @@ void draw_sorted_objects_to_buffer(void)
                 g_asObjectDrawY_004937d8[obj] = (short)(
                     g_asObjectScreenY_00493628[obj] +
                     g_nViewCenterY_005c80da);
+#ifdef WC2_QUEST
+                /* Stars come from the VR star sphere; dust is 3D. */
+                if (g_nNavPointerObject_004931b8 != obj &&
+                    (objectClass == OBJECT_CLASS_STAR ||
+                     SdlQuestStereoOwnsObject(obj)) &&
+                    SdlQuestStereoOwnsObject(-2))
+                    break;
+#endif
                 if (g_nNavPointerObject_004931b8 == obj) {
 #ifdef SDL_PORT
                     if (!SdlRecordSpaceSprite(
@@ -960,6 +968,11 @@ void draw_sorted_objects_to_buffer(void)
                 g_asObjectDrawY_004937d8[obj] = (short)(
                     g_asObjectScreenY_00493628[obj] +
                     g_nViewCenterY_005c80da);
+#ifdef WC2_QUEST
+                /* Drawn in 3D by the VR renderer instead. */
+                if (SdlQuestStereoOwnsObject(obj))
+                    break;
+#endif
                 if (g_apObjectShape_00493868[obj] != 0) {
 #ifdef SDL_PORT
                     if (!SdlRecordSpaceSprite(

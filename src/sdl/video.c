@@ -1,6 +1,9 @@
 #include "game.h"
 
 #include "video_internal.h"
+#ifdef WC2_QUEST
+#include "../quest/quest_xr.h"
+#endif
 
 static SDL_Renderer *g_pSdlRenderer;
 static unsigned int g_dwSdlStaticNoiseSeed = 0x1f123bb5U;
@@ -87,6 +90,11 @@ void SdlSetEgaDitherEnabled(int enabled)
 int SdlInitializeVideo(SDL_Window *window)
 {
     SdlShutdownVideo();
+#ifdef WC2_QUEST
+    /* The XR thread owns presentation; the Android window stays unused. */
+    (void)window;
+    return 1;
+#endif
     if (SdlUsingGlRenderer())
         return SdlGlRendererInitialize(window);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
@@ -168,6 +176,15 @@ int SdlPresentIndexedFrame(const unsigned char *pixels,
         palette = g_abEgaDitherPalette;
     }
 
+#ifdef WC2_QUEST
+    if (pixels == 0 || palette == 0)
+        return 0;
+    if (!SdlQuestPresentStereo(pixels, palette))
+        QuestXr_SubmitIndexedFrame(pixels, palette);
+    if (restoreMouseCursor)
+        RestoreMouseCursorBackground();
+    return 1;
+#endif
     if (SdlUsingGlRenderer()) {
         result = SdlGlRendererPresent(pixels, palette);
         if (result != 0 && restoreMouseCursor)
@@ -209,6 +226,11 @@ void SdlWaitForVerticalBlank(void)
 {
     SDL_Rect dest;
 
+#ifdef WC2_QUEST
+    (void)dest;
+    QuestXr_WaitForDisplayTick();
+    return;
+#endif
     if (SdlUsingGlRenderer()) {
         SdlGlRendererWaitForVerticalBlank();
         return;
@@ -230,6 +252,10 @@ void SdlBeginSpaceFrame(
     const struct ScreenViewportGeometry *geometry, int viewportMode,
     int fullViewportCopy, unsigned char clearColour)
 {
+#ifdef WC2_QUEST
+    SdlQuestCaptureSpaceFrame(geometry, viewportMode, fullViewportCopy,
+                              clearColour);
+#endif
     if (SdlUsingGlRenderer()) {
         SdlGlRendererBeginSpaceFrame(
             geometry, viewportMode, fullViewportCopy, clearColour);
@@ -246,6 +272,9 @@ void SdlCancelSpaceFrame(void)
 {
     /* RunSpaceFlight calls this when the spaceflight session ends. */
     SdlEndJoystickSpaceflight();
+#ifdef WC2_QUEST
+    SdlQuestCancelStereo();
+#endif
     if (SdlUsingGlRenderer())
         SdlGlRendererCancelSpaceFrame();
 }

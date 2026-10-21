@@ -86,8 +86,15 @@ int SdlResolvePath(const char *path, char *resolved,
     }
     if (normalized[0] == '/')
         strcpy(prefix, "/");
+#ifdef WC2_QUEST
+    /* Android's SDL_RWFromFile/SDL_LoadFile read relative paths from the
+     * APK's assets, so resolved game paths must be absolute. */
+    else if (getcwd(prefix, sizeof(prefix)) == 0)
+        strcpy(prefix, ".");
+#else
     else
         strcpy(prefix, ".");
+#endif
     cursor = normalized;
     while (*cursor == '/')
         cursor++;

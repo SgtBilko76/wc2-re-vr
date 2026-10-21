@@ -411,6 +411,12 @@ static void SdlOpenJoystick(int deviceIndex)
     instanceId = SDL_JoystickGetDeviceInstanceID(deviceIndex);
     if (instanceId < 0 || SdlFindJoystick(instanceId) != -1)
         return;
+#ifdef WC2_QUEST
+    /* Android also lists the Touch controllers as gamepads; they never
+     * report input in an immersive session.  Use only the virtual pad. */
+    if (!SdlQuestIsQuestPad(deviceIndex))
+        return;
+#endif
     slot = SdlFindFreeJoystickSlot();
     if (slot == -1)
         return;
@@ -756,6 +762,15 @@ void SdlApplyJoystickFlightControls(void)
         break;
     }
 }
+
+#ifdef WC2_QUEST
+int SdlQuestIsPiloting(void)
+{
+    return g_bSdlJoystickSpaceflightActive &&
+        g_pfnInputPump_005c840c == get_player_input &&
+        g_nArcadeState_0049d75c == 0;
+}
+#endif
 
 void SdlEndJoystickSpaceflight(void)
 {

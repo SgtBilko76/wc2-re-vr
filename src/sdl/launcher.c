@@ -2,6 +2,11 @@
 
 #include "video_internal.h"
 #include "slint/launcher_api.h"
+#ifdef WC2_QUEST
+#include "../quest/quest_xr.h"
+int SdlQuestStartup(int *argumentCount, char ***arguments);
+void SdlQuestCreatePad(void);
+#endif
 
 #include <setjmp.h>
 #include <stdio.h>
@@ -305,6 +310,11 @@ int main(int argumentCount, char **arguments)
     int usingDosData;
     SdlLauncherOptions launcherOptions;
 
+#ifdef WC2_QUEST
+    /* Logging, data directory and Quest default options. */
+    if (!SdlQuestStartup(&argumentCount, &arguments))
+        return 1;
+#endif
     launcherGuiImplicit = argumentCount == 1;
     SdlInitializeLauncherOptions(&launcherOptions);
     if (!SdlParsePortArguments(&argumentCount, arguments,
@@ -351,6 +361,14 @@ int main(int argumentCount, char **arguments)
         fprintf(stderr, "SDL initialization failed: %s\n", SDL_GetError());
         return 1;
     }
+#ifdef WC2_QUEST
+    if (!QuestXr_Start()) {
+        fprintf(stderr, "OpenXR start failed\n");
+        SDL_Quit();
+        return 1;
+    }
+    SdlQuestCreatePad();
+#endif
 
     windowFlags = SDL_WINDOW_RESIZABLE;
     if (!SdlConfigureVideoWindow(&windowFlags)) {
@@ -440,6 +458,9 @@ int main(int argumentCount, char **arguments)
     DIBunInstall();
     SdlShutdownJoysticks();
     SDL_DestroyWindow(window);
+#ifdef WC2_QUEST
+    QuestXr_Shutdown();
+#endif
     SDL_Quit();
     return gameResult;
 }

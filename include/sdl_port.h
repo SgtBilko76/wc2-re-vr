@@ -474,4 +474,23 @@ int SdlVsnprintf(char *buffer, size_t size, const char *format,
 #define TRUE 1
 #endif
 
+#ifdef WC2_QUEST
+void SdlQuestInjectMouse(int x, int y, int primaryButton,
+                         int secondaryButton, int buttonEvent);
+int SdlQuestIsPiloting(void);
+void SdlQuestServiceInput(void);
+int SdlQuestIsQuestPad(int deviceIndex);
+void SdlQuestSetTextInput(int active);
+int SdlQuestTakeShift(void);
+struct ScreenViewportGeometry;
+void SdlQuestCaptureSpaceFrame(const struct ScreenViewportGeometry *geometry,
+                               int viewportMode, int fullViewportCopy,
+                               unsigned char clearColour);
+int SdlQuestStereoOwnsObject(int obj);
+void SdlQuestSetYesNoPrompt(int active);
+void SdlQuestCancelStereo(void);
+int SdlQuestPresentStereo(const unsigned char *pixels,
+                          const unsigned char *palette);
+#endif
+
 #endif /* SDL_PORT_H */

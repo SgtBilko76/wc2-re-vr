@@ -45,3 +45,16 @@ __pycache__/
 
 # The Ghidra MCP bridge is a local tool, not part of the reconstruction.
 bridge_mcp_ghidra.py
+
+# Quest build output
+quest/build-ndk/
+quest/build-ndk*.log
+quest/android/.gradle/
+quest/android/.cxx/
+quest/android/app/build/
+quest/android/app/.cxx/
+quest/android/build/
+quest/android/local.properties
+quest/third_party/SDL2-*/
+quest/android/app/src/main/java/org/libsdl/
+*.iso

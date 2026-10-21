@@ -1,0 +1,14 @@
+# Wing Commander II VR settings - restart the game after editing.
+# Flight stick (pitch / yaw / roll):
+#   stick_sensitivity: overall turn-rate scale (0.5 = half as fast)
+#   stick_expo: 0 = linear, 1 = very soft centre for precise aiming
+#   stick_deadzone: ignored stick deflection around the centre
+stick_sensitivity=1.0
+stick_expo=0.65
+stick_deadzone=0.10
+# Cockpit / scene
+cockpit3d=1
+cockpit_wrap=1
+dash_distance=0.9
+hud_distance=8
+world_scale=0.25

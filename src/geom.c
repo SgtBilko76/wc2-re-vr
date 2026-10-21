@@ -1583,6 +1583,26 @@ void ReleaseModalTextPanel(void)
     }
 }
 
+#ifdef WC2_QUEST
+static short ReadTextInputBody(char *destination, short maximumLength,
+                               volatile short mode,
+                               volatile short allowPathSeparators);
+
+short ReadTextInput(char *destination, short maximumLength,
+                    volatile short mode,
+                    volatile short allowPathSeparators)
+{
+    short result;
+
+    SdlQuestSetTextInput(1);
+    result = ReadTextInputBody(destination, maximumLength, mode,
+                               allowPathSeparators);
+    SdlQuestSetTextInput(0);
+    return result;
+}
+#define ReadTextInput ReadTextInputBody
+#endif
+
 /* Function start: 0x4597E3 */
 short ReadTextInput(char *destination, short maximumLength,
                     volatile short mode,
