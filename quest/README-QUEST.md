@@ -1,4 +1,4 @@
-# Wing Commander II VR (Meta Quest 3)
+# Wing Commander II VR (Meta Quest 3 and PICO) — 1.0.1
 
 Standalone Quest build of the wc2-re reconstruction (SDL2 port of *Wing
 Commander II: Vengeance of the Kilrathi*).  Space flight is in stereo 3D with
@@ -16,7 +16,7 @@ synthesized sound effects; *Kilrathi Saga* data should also work.
 ## Install
 
 1. Install the APK (SideQuest, or):
-   `adb install -r WingCommanderIIVR-1.0.0.apk`
+   `adb install -r WingCommanderIIVR-1.0.1.apk`
 2. Copy the game data: the contents of the `WING2` folder of the CD (or of your
    installed game folder: `WC2.EXE` and the whole `GAMEDAT` folder) go to
    `/sdcard/WingCommander2` on the headset:
@@ -29,6 +29,15 @@ synthesized sound effects; *Kilrathi Saga* data should also work.
    first start, allow "Access to all files" when asked (or:
    `adb shell appops set com.bilko.wc2vr MANAGE_EXTERNAL_STORAGE allow`).
    A red screen means the game data was not found.
+
+### PICO (untested)
+
+The same APK also runs on PICO 4 / Neo 3 (PICO OS 5.9.0 or
+newer): the PICO controllers use the same button layout as the Touch
+controllers below.  PICO support is new and not tested on PICO hardware yet.
+Install with `adb install -r WingCommanderIIVR-1.0.1.apk` (or the PICO file manager), copy
+the game data to `/sdcard/WingCommander2` the same way, and allow storage access when
+the app asks on the first start (it restarts by itself afterwards).
 
 Saved games and pilot rosters are written to `/sdcard/WingCommander2/GAMEDAT`
 as in the DOS game.

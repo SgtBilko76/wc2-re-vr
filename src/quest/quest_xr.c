@@ -191,6 +191,7 @@ static XrSpace g_viewSpace = XR_NULL_HANDLE;
 static XrSessionState g_sessionState = XR_SESSION_STATE_UNKNOWN;
 static int g_sessionRunning;
 static int g_hasRefreshRateExt;
+static int g_hasPicoControllers; /* XR_BD_controller_interaction */
 
 static XrActionSet g_actionSet;
 static XrAction g_stickXAction, g_stickYAction;
@@ -390,6 +391,11 @@ static int InitInstance(void)
         extensions[enabled++] = XR_FB_DISPLAY_REFRESH_RATE_EXTENSION_NAME;
         g_hasRefreshRateExt = 1;
     }
+    /* PICO runtimes expose their controllers through this extension. */
+    if (HasExtension(props, extCount, "XR_BD_controller_interaction")) {
+        extensions[enabled++] = "XR_BD_controller_interaction";
+        g_hasPicoControllers = 1;
+    }
     free(props);
 
     memset(&androidInfo, 0, sizeof(androidInfo));
@@ -408,6 +414,18 @@ static int InitInstance(void)
     createInfo.enabledExtensionCount = enabled;
     createInfo.enabledExtensionNames = extensions;
     XR_CHECK(xrCreateInstance(&createInfo, &g_instance));
+    {
+        XrInstanceProperties instanceProps;
+
+        memset(&instanceProps, 0, sizeof(instanceProps));
+        instanceProps.type = XR_TYPE_INSTANCE_PROPERTIES;
+        if (XR_SUCCEEDED(xrGetInstanceProperties(g_instance, &instanceProps)))
+            LOGI("OpenXR runtime: %s %u.%u.%u%s", instanceProps.runtimeName,
+                 XR_VERSION_MAJOR(instanceProps.runtimeVersion),
+                 XR_VERSION_MINOR(instanceProps.runtimeVersion),
+                 XR_VERSION_PATCH(instanceProps.runtimeVersion),
+                 g_hasPicoControllers ? " (PICO controllers)" : "");
+    }
 
     memset(&systemInfo, 0, sizeof(systemInfo));
     systemInfo.type = XR_TYPE_SYSTEM_GET_INFO;
@@ -516,6 +534,26 @@ static int InitActions(void)
     suggested.countSuggestedBindings = (uint32_t)n;
     suggested.suggestedBindings = bindings;
     XR_CHECK(xrSuggestInteractionProfileBindings(g_instance, &suggested));
+
+    /* PICO controllers have the same buttons under the same paths as the
+     * Touch controllers.  Not fatal: only the Touch profile is required. */
+    if (g_hasPicoControllers) {
+        static const char *const picoProfiles[] = {
+            "/interaction_profiles/bytedance/pico4_controller",
+            "/interaction_profiles/bytedance/pico4s_controller",
+            "/interaction_profiles/bytedance/pico_neo3_controller",
+        };
+        size_t i;
+
+        for (i = 0; i < sizeof(picoProfiles) / sizeof(picoProfiles[0]); i++) {
+            XrResult result;
+
+            suggested.interactionProfile = MakePath(picoProfiles[i]);
+            result = xrSuggestInteractionProfileBindings(g_instance, &suggested);
+            LOGI("PICO bindings %s: %s", picoProfiles[i],
+                 XR_SUCCEEDED(result) ? "ok" : "not supported");
+        }
+    }
 
     for (hand = 0; hand < 2; hand++) {
         XrActionSpaceCreateInfo spaceInfo;
