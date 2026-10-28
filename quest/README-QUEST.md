@@ -1,5 +1,7 @@
 # Wing Commander II VR (Meta Quest 3 and PICO) — 1.0.1
 
+**Download, install guide, controls and pictures: [portroyale.online/wingcommander2.html](https://portroyale.online/wingcommander2.html)**
+
 Standalone Quest build of the wc2-re reconstruction (SDL2 port of *Wing
 Commander II: Vengeance of the Kilrathi*).  Space flight is in stereo 3D with
 head-look: ships are placed at their real depth, stars sit at infinity, and the
